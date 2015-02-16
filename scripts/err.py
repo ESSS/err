@@ -144,6 +144,7 @@ if __name__ == "__main__":
     backend_group.add_argument('-T', '--text', action='store_true', help='locale text debug backend')
     backend_group.add_argument('-G', '--graphic', action='store_true', help='local graphical debug mode backend')
     backend_group.add_argument('-N', '--null', action='store_true', help='no backend')
+    backend_group.add_argument('-S', '--slack', action='store_true', help='Slack backend')
 
     if not ON_WINDOWS:
         option_group = parser.add_argument_group('arguments to run it as a Daemon')
@@ -158,7 +159,7 @@ if __name__ == "__main__":
         sys.path.insert(0, config_path)  # appends the current config in order to find config.py
     else:
         config_path = execution_dir
-    filtered_mode = [mname for mname in ('text', 'graphic', 'campfire', 'hipchat', 'irc', 'xmpp', 'tox', 'null') if
+    filtered_mode = [mname for mname in ('text', 'graphic', 'campfire', 'hipchat', 'irc', 'xmpp', 'tox', 'null', 'slack') if
                      args[mname]]
     mode = filtered_mode[0] if filtered_mode else 'xmpp'  # default value
 
@@ -203,6 +204,11 @@ if __name__ == "__main__":
         from errbot.backends.null import NullBackend
 
         return NullBackend
+
+    def slack():
+        from errbot.backends.slack import SlackBackend
+
+        return SlackBackend
 
     bot_class = locals()[mode]()
     # Check if at least we can start to log something before trying to start
