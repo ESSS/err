@@ -56,7 +56,7 @@ class SlackBackend(ErrBot):
 
     def send_message(self, msg):
         super(SlackBackend, self).send_message(msg)
-        self.conn.rtm_send_message(unicode(msg.to), msg.body)
+        self.conn.rtm_send_message(str(msg.to), msg.body)
 
 
     def connect(self):
@@ -70,9 +70,7 @@ class SlackBackend(ErrBot):
 
     def build_message(self, text):
         from errbot.backends.base import Message, build_message
-        return build_message(text)
-#        text, html = build_text_html_message_pair(text)
-#        return Message(text, html=html)
+        return build_message(text, Message)
 
 
     def join_room(self, room, username=None, password=None):
