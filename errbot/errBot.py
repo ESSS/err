@@ -75,6 +75,8 @@ def bot_config_defaults(config):
         config.MESSAGE_SIZE_LIMIT = 10000  # Corresponds with what HipChat accepts
     if not hasattr(config, 'GROUPCHAT_NICK_PREFIXED'):
         config.GROUPCHAT_NICK_PREFIXED = False
+    if not hasattr(config, 'PROGRAMS'):
+        config.PROGRAMS = {}
 
 
 class ErrBot(Backend, StoreMixin):

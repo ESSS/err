@@ -79,7 +79,11 @@ def tail(f, window=20):
 
 def which(program):
     def is_exe(file_path):
-        return os.path.isfile(file_path) and os.access(file_path, os.X_OK)
+        result = os.path.isfile(file_path) and os.access(file_path, os.X_OK)
+        if not result and os.name == 'nt':
+            file_path += '.exe'
+            return os.path.isfile(file_path) and os.access(file_path, os.X_OK)
+        return result
 
     fpath, fname = os.path.split(program)
     if fpath:

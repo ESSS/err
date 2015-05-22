@@ -30,19 +30,17 @@ class SlackBackend(ErrBot):
         except KeyboardInterrupt:
             pass
         finally:
-            logging.debug(u"Trigger disconnect callback")
             self.disconnect_callback()
-            logging.debug(u"Trigger shutdown")
             self.shutdown()
 
 
     def _handle_event(self, event):
         from errbot.backends.base import Message
 
-        type_ = event.get(u'type')
-        text = event.get(u'text')
-        if type_ in (u'message',) and text:
-            ##logging.debug(u"event: %s" % event)
+        type_ = event.get('type')
+        text = event.get('text')
+        subtype = event.get('subtype')
+        if type_ in (u'message',) and subtype is None and text:
             channel = event[u'channel']
             if channel == u'D03MABG2M':
                 type_ = u'chat'
@@ -56,7 +54,16 @@ class SlackBackend(ErrBot):
 
     def send_message(self, msg):
         super(SlackBackend, self).send_message(msg)
-        self.conn.rtm_send_message(str(msg.to), msg.body)
+        logging.info(u"send_message {}".format(msg))
+        self.conn.api_call(
+            'chat.postMessage',
+            token=self.token,
+            channel=str(msg.to),
+            text=msg.body,
+            icon_url='https://raw.githubusercontent.com/gbin/err/master/docs/_static/err.png',
+            username=msg.frm,
+        )
+        #self.conn.rtm_send_message(str(msg.to), msg.body)
 
 
     def connect(self):
@@ -64,7 +71,9 @@ class SlackBackend(ErrBot):
 
         if not self.conn:
             self.conn = SlackClient(self.token)
-            self.conn.rtm_connect()
+            r = self.conn.rtm_connect()
+            if not r:
+                raise RuntimeError("SLACK: Connection failed. Invalid token '%s'?" % self.token)
         return self.conn
 
 
